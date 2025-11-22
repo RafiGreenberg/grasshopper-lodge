@@ -1,0 +1,13 @@
+[build]
+  publish = "site"
+  command = ""
+
+[context.production.environment]
+  # Add any env vars required by your build here
+
+[headers]
+  [[headers]]
+  for = "/*"
+  [headers.values]
+  X-Frame-Options = "SAMEORIGIN"
+  X-Content-Type-Options = "nosniff"

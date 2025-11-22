@@ -1,0 +1,37 @@
+/* Simple responsive styles for Grasshopper Lodge site */
+:root{
+  --accent:#2b6cb0;
+  --muted:#6b7280;
+  --wrap:1100px;
+  --max-width:1100px;
+}
+*{box-sizing:border-box}
+body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;line-height:1.5;margin:0;color:#111}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:1rem}
+.site-header{background:#fff; border-bottom:1px solid #eee}
+.site-title{margin:0;padding:1rem 0;display:inline-block}
+.site-nav{float:right;margin-top:0.6rem}
+.site-nav a{margin-left:1rem;color:var(--accent);text-decoration:none}
+.hero{padding:2rem 0}
+.gallery h3{margin-top:0}
+.muted{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.6rem}
+.grid img{width:100%;height:180px;object-fit:cover;border-radius:6px;cursor:pointer;display:block}
+.about{margin:2rem 0}
+.rates{width:100%;border-collapse:collapse;margin-bottom:1rem}
+.rates th,.rates td{padding:0.6rem;border:1px solid #eee;text-align:left}
+.calendar-wrap{overflow:auto}
+.site-footer{border-top:1px solid #eee;padding:1rem 0;margin-top:2rem}
+/* Lightbox */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:2rem;visibility:hidden;opacity:0;transition:opacity .2s}
+.lightbox[aria-hidden="false"]{visibility:visible;opacity:1}
+.lightbox img{max-width:90%;max-height:80%;border-radius:6px}
+.lb-close{position:absolute;right:1rem;top:1rem;background:transparent;border:0;color:#fff;font-size:1.6rem;cursor:pointer}
+.lb-caption{color:#ddd;margin-top:0.6rem;text-align:center}
+/* Booking form */
+.booking-form{max-width:640px;margin-top:1rem;display:grid;gap:0.6rem}
+.booking-form label{display:block}
+.booking-form input[type="text"],.booking-form input[type="email"],.booking-form input[type="tel"],.booking-form input[type="date"],.booking-form input[type="number"],.booking-form textarea{width:100%;padding:0.6rem;border:1px solid #ddd;border-radius:6px}
+.booking-form button{background:var(--accent);color:#fff;padding:0.65rem 1rem;border:0;border-radius:6px;cursor:pointer}
+#form-msg{margin-top:0.5rem;color:green}
+@media (max-width:640px){.site-nav{float:none;margin-top:0.2rem}}
