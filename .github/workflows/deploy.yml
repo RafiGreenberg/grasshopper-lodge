@@ -1,5 +1,9 @@
 name: Deploy Site to GitHub Pages
 
+# Require write permission for contents so the action can push the gh-pages branch
+permissions:
+  contents: write
+
 on:
   push:
     branches: [ master ]
@@ -9,8 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        # Allow the checkout action to persist credentials so later steps can push
         with:
-          persist-credentials: false
+          persist-credentials: true
 
       - name: Setup Node (optional)
         uses: actions/setup-node@v4
