@@ -1,0 +1,14 @@
+{
+  "name": "grasshopper-lodge",
+  "version": "1.0.0",
+  "description": "Static site for Grasshopper Lodge — helper scripts",
+  "scripts": {
+    "generate-images": "node scripts/generate-images.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^2.6.7",
+    "sharp": "^0.32.6"
+  }
+}

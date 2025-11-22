@@ -1,37 +1,59 @@
-/* Simple responsive styles for Grasshopper Lodge site */
+/* Grasshopper Lodge — improved site styles */
 :root{
-  --accent:#2b6cb0;
-  --muted:#6b7280;
+  --accent:#87502b; /* warm wood accent */
+  --muted:#6b6b6b;
   --wrap:1100px;
-  --max-width:1100px;
+  --bg:#fbf7f2;
+  --card:#fff;
 }
 *{box-sizing:border-box}
-body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;line-height:1.5;margin:0;color:#111}
+body{font-family:'Open Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;line-height:1.6;margin:0;color:#222;background:var(--bg)}
 .wrap{max-width:var(--wrap);margin:0 auto;padding:1rem}
-.site-header{background:#fff; border-bottom:1px solid #eee}
-.site-title{margin:0;padding:1rem 0;display:inline-block}
-.site-nav{float:right;margin-top:0.6rem}
-.site-nav a{margin-left:1rem;color:var(--accent);text-decoration:none}
-.hero{padding:2rem 0}
+.site-header{background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.0));border-bottom:1px solid rgba(0,0,0,0.06);position:sticky;top:0;z-index:50}
+.site-header .wrap{display:flex;align-items:center;justify-content:space-between}
+.site-brand{display:flex;align-items:center;gap:0.8rem}
+.site-title{font-family:'Merriweather', serif;margin:0;font-size:1.25rem;color:var(--accent)}
+.site-nav a{margin-left:1rem;color:#444;text-decoration:none;font-weight:600;padding:0.6rem;border-radius:6px}
+.site-nav a:hover{background:rgba(135,80,43,0.08)}
+
+/* Hero */
+.hero{padding:4rem 0;background-size:cover;background-position:center;border-radius:6px;color:#fff;text-align:left;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.45));}
+.hero .wrap{position:relative;z-index:2}
+.hero h2{font-family:'Merriweather', serif;font-size:2.1rem;margin:0 0 0.5rem}
+.hero p{max-width:60ch;color:rgba(255,255,255,0.95)}
+.cta{display:inline-block;margin-top:1rem;background:var(--accent);color:#fff;padding:0.6rem 1rem;border-radius:8px;text-decoration:none}
+
+/* Gallery */
 .gallery h3{margin-top:0}
-.muted{color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.6rem}
-.grid img{width:100%;height:180px;object-fit:cover;border-radius:6px;cursor:pointer;display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.grid img{width:100%;height:260px;object-fit:cover;border-radius:8px;cursor:pointer;display:block;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+
 .about{margin:2rem 0}
-.rates{width:100%;border-collapse:collapse;margin-bottom:1rem}
-.rates th,.rates td{padding:0.6rem;border:1px solid #eee;text-align:left}
-.calendar-wrap{overflow:auto}
-.site-footer{border-top:1px solid #eee;padding:1rem 0;margin-top:2rem}
+.muted{color:var(--muted)}
+
+.rates{width:100%;border-collapse:collapse;margin-bottom:1rem;background:var(--card);border-radius:8px;overflow:hidden}
+.rates th,.rates td{padding:0.9rem;border-bottom:1px solid #f0ebe6;text-align:left}
+.rates thead th{background:#faf5f2;font-weight:700;color:#333}
+.calendar-wrap{overflow:auto;padding:0.5rem;background:var(--card);border-radius:8px}
+.site-footer{border-top:1px solid rgba(0,0,0,0.06);padding:1.25rem 0;margin-top:2rem;text-align:center}
+
 /* Lightbox */
 .lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:2rem;visibility:hidden;opacity:0;transition:opacity .2s}
 .lightbox[aria-hidden="false"]{visibility:visible;opacity:1}
-.lightbox img{max-width:90%;max-height:80%;border-radius:6px}
-.lb-close{position:absolute;right:1rem;top:1rem;background:transparent;border:0;color:#fff;font-size:1.6rem;cursor:pointer}
+.lightbox img{max-width:92%;max-height:82%;border-radius:6px;box-shadow:0 30px 60px rgba(0,0,0,0.6)}
+.lb-close{position:absolute;right:1rem;top:1rem;background:transparent;border:0;color:#fff;font-size:1.8rem;cursor:pointer}
 .lb-caption{color:#ddd;margin-top:0.6rem;text-align:center}
+
 /* Booking form */
-.booking-form{max-width:640px;margin-top:1rem;display:grid;gap:0.6rem}
-.booking-form label{display:block}
-.booking-form input[type="text"],.booking-form input[type="email"],.booking-form input[type="tel"],.booking-form input[type="date"],.booking-form input[type="number"],.booking-form textarea{width:100%;padding:0.6rem;border:1px solid #ddd;border-radius:6px}
-.booking-form button{background:var(--accent);color:#fff;padding:0.65rem 1rem;border:0;border-radius:6px;cursor:pointer}
-#form-msg{margin-top:0.5rem;color:green}
-@media (max-width:640px){.site-nav{float:none;margin-top:0.2rem}}
+.booking-form{max-width:720px;margin-top:1rem;display:grid;gap:0.8rem;background:var(--card);padding:1rem;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.06)}
+.booking-form label{display:block;font-weight:600}
+.booking-form input[type="text"],.booking-form input[type="email"],.booking-form input[type="tel"],.booking-form input[type="date"],.booking-form input[type="number"],.booking-form textarea{width:100%;padding:0.75rem;border:1px solid #eee;border-radius:6px;margin-top:0.25rem}
+.booking-form button{background:var(--accent);color:#fff;padding:0.75rem 1rem;border:0;border-radius:8px;cursor:pointer;font-weight:700}
+#form-msg{margin-top:0.5rem;color:green;font-weight:600}
+
+@media (max-width:880px){
+  .hero h2{font-size:1.6rem}
+  .grid img{height:180px}
+}
+
