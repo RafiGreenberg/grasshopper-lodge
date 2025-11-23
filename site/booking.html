@@ -28,7 +28,7 @@
       <h2>Booking Request</h2>
       <p>Please fill out the form and we'll get back to you within 24–48 hours to confirm and process payment.</p>
 
-      <form id="booking-form" class="booking-form" method="POST" action="https://formspree.io/f/your-form-id">
+      <form id="booking-form" class="booking-form" method="POST" action="/api/booking">
         <label>Name <input type="text" name="name" required></label>
         <label>Email <input type="email" name="email" required></label>
         <label>Phone <input type="tel" name="phone"></label>
@@ -45,7 +45,7 @@
         <div id="form-msg" role="status" aria-live="polite"></div>
       </form>
 
-      <p class="muted">The form above posts to Formspree by default. Replace the `action` attribute with your endpoint (Formspree, Netlify Forms, or your own handler).</p>
+      <p class="muted">The form above posts to the local endpoint `/api/booking` by default. To handle submissions yourself, run the included booking API server (see `server/README.md`) or change the `action` to an external handler.</p>
     </section>
   </main>
 

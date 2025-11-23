@@ -3,12 +3,21 @@
   "version": "1.0.0",
   "description": "Static site for Grasshopper Lodge — helper scripts",
   "scripts": {
-    "generate-images": "node scripts/generate-images.js"
+    "generate-images": "node scripts/generate-images.js",
+    "start-server": "node server/index.js",
+    "dev-server": "nodemon server/index.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "node-fetch": "^2.6.7",
-    "sharp": "^0.32.6"
+    "sharp": "^0.32.6",
+    "express": "^4.18.2",
+    "nodemailer": "^6.9.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }

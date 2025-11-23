@@ -53,22 +53,29 @@ document.addEventListener('DOMContentLoaded', function(){
         return;
       }
 
-      // If using Formspree (or other online endpoint) do an AJAX submit for better UX
-      if(action && action.includes('formspree')){
-        ev.preventDefault();
-        msg.textContent = 'Sending...';
-        const data = new FormData(form);
-        try{
-          const res = await fetch(action, {method:'POST', body: data, headers:{'Accept':'application/json'}});
-          if(res.ok){
-            msg.textContent = 'Thanks — booking request sent.';
-            form.reset();
-          } else {
-            const json = await res.json();
-            msg.textContent = (json && json.error) ? json.error : 'Submission failed — try again.';
+      // If using Formspree, our own endpoint, or any relative action, do an AJAX submit for better UX
+      if(action){
+        // Only intercept if it's a remote Formspree or our own API (relative path starting with /)
+        const shouldAjax = action.includes('formspree') || action.startsWith('/');
+        if(shouldAjax){
+          ev.preventDefault();
+          msg.textContent = 'Sending...';
+          const data = new FormData(form);
+          try{
+            const res = await fetch(action, {method:'POST', body: data, headers:{'Accept':'application/json'}});
+            if(res.ok){
+              msg.textContent = 'Thanks — booking request sent.';
+              form.reset();
+            } else {
+              // Try to parse JSON error, otherwise use status text
+              let text = 'Submission failed — try again.';
+              try{ const json = await res.json(); if(json && json.error) text = json.error; }catch(e){}
+              msg.textContent = text;
+            }
+          }catch(err){
+            msg.textContent = 'Network error — try again later.';
+            console.error('Submit error', err);
           }
-        }catch(err){
-          msg.textContent = 'Network error — try again later.';
         }
       }
     });
