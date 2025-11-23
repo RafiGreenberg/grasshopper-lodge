@@ -1,0 +1,58 @@
+name: Deploy to GCP (Cloud Run + GCS)
+
+on:
+  push:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy frontend and backend to GCP
+    runs-on: ubuntu-latest
+    env:
+      CLOUD_RUN_SERVICE: grasshopper-lodge-server
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Deploy backend to Cloud Run (build image and deploy)
+        env:
+          IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/${{ env.CLOUD_RUN_SERVICE }}:${{ github.sha }}
+        run: |
+          # Build and push container image using Cloud Build
+          gcloud builds submit --tag $IMAGE server
+
+          # Deploy to Cloud Run; allow unauthenticated by default
+          gcloud run deploy ${{ env.CLOUD_RUN_SERVICE }} \
+            --image $IMAGE \
+            --region ${{ secrets.GCP_REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars "SMTP_HOST=${{ secrets.SMTP_HOST }},SMTP_PORT=${{ secrets.SMTP_PORT }},SMTP_USER=${{ secrets.SMTP_USER }},SMTP_PASS=${{ secrets.SMTP_PASS }},NOTIFY_EMAIL=${{ secrets.NOTIFY_EMAIL }}"
+
+      - name: Deploy frontend to GCS
+        run: |
+          # Sync the static `site/` folder to the GCS bucket
+          gsutil -m rsync -r site/ gs://${{ secrets.GCS_BUCKET }}
+          # Make bucket website-ready
+          gsutil web set -m index.html gs://${{ secrets.GCS_BUCKET }}
+          # Make objects publicly readable
+          gsutil iam ch allUsers:objectViewer gs://${{ secrets.GCS_BUCKET }}
+
+      - name: Output site URL
+        run: |
+          echo "Frontend published to: https://storage.googleapis.com/${{ secrets.GCS_BUCKET }}/index.html"
