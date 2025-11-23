@@ -35,8 +35,13 @@ jobs:
         run: |
           set -euo pipefail
           echo "Using image: $IMAGE"
-          # Use repository root as build context and point Dockerfile to server/Dockerfile
-          gcloud builds submit --tag "$IMAGE" --dockerfile=server/Dockerfile .
+          # Build image locally in the runner and push to GCR (useful when Cloud Build flags differ)
+          echo "Configuring Docker for GCR authentication"
+          gcloud auth configure-docker --quiet
+          echo "Building Docker image from server/Dockerfile"
+          docker build -f server/Dockerfile -t "$IMAGE" server
+          echo "Pushing image to GCR: $IMAGE"
+          docker push "$IMAGE"
 
           # Deploy to Cloud Run; allow unauthenticated by default
           gcloud run deploy ${{ env.CLOUD_RUN_SERVICE }} \
