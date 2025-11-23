@@ -31,16 +31,17 @@ jobs:
 
       - name: Deploy backend to Cloud Run (build image and deploy)
         env:
-          IMAGE: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.CLOUD_RUN_SERVICE }}:${{ github.sha }}
+          # Artifact Registry image path must include repository and image name
+          IMAGE: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.CLOUD_RUN_SERVICE }}/${{ env.CLOUD_RUN_SERVICE }}:${{ github.sha }}
         run: |
           set -euo pipefail
           echo "Using image: $IMAGE"
-          # Build image locally in the runner and push to GCR (useful when Cloud Build flags differ)
-          echo "Configuring Docker for GCR authentication"
-          gcloud auth configure-docker --quiet
+          # Build image locally in the runner and push to Artifact Registry
+          echo "Configuring Docker for Artifact Registry authentication"
+          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
           echo "Building Docker image from server/Dockerfile"
           docker build -f server/Dockerfile -t "$IMAGE" server
-          echo "Pushing image to GCR: $IMAGE"
+          echo "Pushing image to Artifact Registry: $IMAGE"
           docker push "$IMAGE"
 
           # Deploy to Cloud Run; allow unauthenticated by default
