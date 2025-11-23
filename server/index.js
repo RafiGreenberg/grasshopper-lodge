@@ -29,7 +29,9 @@ app.post('/api/booking', async (req, res) => {
     if(errors.length) return res.status(400).json({ error: errors.join('; ') });
 
     // Persist booking to data/bookings.json (append)
-    const dataDir = path.join(__dirname, '..', 'data');
+    // Use process.cwd() so the server behaves correctly whether run from repo root
+    // or when built with `server/` as the Docker build context.
+    const dataDir = path.join(process.cwd(), 'data');
     if(!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
     const file = path.join(dataDir, 'bookings.json');
     const entry = Object.assign({ receivedAt: new Date().toISOString() }, body);
