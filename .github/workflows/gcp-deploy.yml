@@ -31,7 +31,7 @@ jobs:
 
       - name: Deploy backend to Cloud Run (build image and deploy)
         env:
-          IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/${{ env.CLOUD_RUN_SERVICE }}:${{ github.sha }}
+          IMAGE: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.CLOUD_RUN_SERVICE }}:${{ github.sha }}
         run: |
           set -euo pipefail
           echo "Using image: $IMAGE"
