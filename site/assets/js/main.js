@@ -1,5 +1,5 @@
 // Lightbox for gallery
-document.addEventListener('DOMContentLoaded', function(){
+function initSiteJS(){
   // Mark the document as JS-enabled so CSS can safely hide/show JS-driven elements
   try{ document.documentElement.classList.add('js'); }catch(e){}
   const grid = document.querySelector('.grid');
@@ -24,11 +24,18 @@ document.addEventListener('DOMContentLoaded', function(){
     lightbox.setAttribute('aria-hidden','true');
     lbImg.src = '';
   }
-  lbClose.addEventListener('click', closeLB);
-  lightbox.addEventListener('click', (e)=>{
-    if(e.target === lightbox) closeLB();
-  });
-  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLB(); });
+  if(lbClose && typeof lbClose.addEventListener === 'function'){
+    lbClose.addEventListener('click', closeLB);
+  }
+  if(lightbox && typeof lightbox.addEventListener === 'function'){
+    lightbox.addEventListener('click', (e)=>{
+      if(e.target === lightbox) closeLB();
+    });
+  }
+  // Only bind Escape handler when lightbox exists
+  if(typeof document.addEventListener === 'function' && lightbox){
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLB(); });
+  }
 
   // Booking form handling (optional AJAX submit to Formspree)
   const form = document.getElementById('booking-form');
@@ -45,15 +52,29 @@ document.addEventListener('DOMContentLoaded', function(){
   // Reveal-on-scroll for subtle entrance animations
   const revealEls = document.querySelectorAll('.reveal-on-scroll');
   if(revealEls && revealEls.length){
-    const obs = new IntersectionObserver((entries, o)=>{
-      entries.forEach(e=>{
-        if(e.isIntersecting){
-          e.target.classList.add('revealed');
-          o.unobserve(e.target);
-        }
+    // If IntersectionObserver is supported, use it to reveal elements when they enter viewport.
+    if('IntersectionObserver' in window){
+      const obs = new IntersectionObserver((entries, o)=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting){
+            e.target.classList.add('revealed');
+            o.unobserve(e.target);
+          }
+        });
+      },{threshold:0.12});
+      revealEls.forEach(el=>obs.observe(el));
+    } else {
+      // Fallback: reveal immediately if observer not available
+      revealEls.forEach(el=>el.classList.add('revealed'));
+    }
+
+    // Safety: if for any reason elements remain hidden (observer blocked, CSS issues,
+    // or slow execution), reveal them after 1s so the page doesn't stay blank.
+    setTimeout(()=>{
+      revealEls.forEach(el=>{
+        if(!el.classList.contains('revealed')) el.classList.add('revealed');
       });
-    },{threshold:0.12});
-    revealEls.forEach(el=>obs.observe(el));
+    }, 1000);
   }
   if(form){
     form.addEventListener('submit', async (ev)=>{
@@ -89,4 +110,11 @@ document.addEventListener('DOMContentLoaded', function(){
       }
     });
   }
-});
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', initSiteJS);
+} else {
+  // DOM already ready
+  initSiteJS();
+}
