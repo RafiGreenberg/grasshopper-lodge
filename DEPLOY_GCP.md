@@ -49,6 +49,14 @@ Notes
 - You will need to create the GCS bucket manually and optionally configure a custom domain and Cloud CDN if you want a fast CDN-backed site.
 - Cloud Run services must be allowed to be unauthenticated if you expect the public to POST to `/api/booking`. For stricter control, configure authentication and an API gateway.
 
+Custom Domain (CNAME)
+---------------------
+
+To serve the frontend on a custom domain (e.g., `www.example.com`), see `CNAME_SETUP.md` for:
+- Simple HTTP CNAME setup (fastest to set up).
+- Cloud Load Balancer + HTTPS (recommended for production).
+- Firebase Hosting integration (simplest with automatic HTTPS).
+
 Troubleshooting
 ---------------
 - If `gcloud builds submit` fails, ensure Cloud Build API is enabled and the service account has Cloud Build Editor.
