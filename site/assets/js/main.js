@@ -31,6 +31,28 @@ document.addEventListener('DOMContentLoaded', function(){
   // Booking form handling (optional AJAX submit to Formspree)
   const form = document.getElementById('booking-form');
   const msg = document.getElementById('form-msg');
+  // Mobile menu toggle
+  const menuToggle = document.querySelector('.menu-toggle');
+  const header = document.querySelector('.site-header');
+  if(menuToggle && header){
+    menuToggle.addEventListener('click', ()=>{
+      header.classList.toggle('nav-open');
+    });
+  }
+
+  // Reveal-on-scroll for subtle entrance animations
+  const revealEls = document.querySelectorAll('.reveal-on-scroll');
+  if(revealEls && revealEls.length){
+    const obs = new IntersectionObserver((entries, o)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          e.target.classList.add('revealed');
+          o.unobserve(e.target);
+        }
+      });
+    },{threshold:0.12});
+    revealEls.forEach(el=>obs.observe(el));
+  }
   if(form){
     form.addEventListener('submit', async (ev)=>{
       const action = form.getAttribute('action');
