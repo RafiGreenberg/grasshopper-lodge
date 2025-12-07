@@ -52,15 +52,6 @@ jobs:
             --allow-unauthenticated \
             --set-env-vars "SMTP_HOST=${{ secrets.SMTP_HOST }},SMTP_PORT=${{ secrets.SMTP_PORT }},SMTP_USER=${{ secrets.SMTP_USER }},SMTP_PASS=${{ secrets.SMTP_PASS }},NOTIFY_EMAIL=${{ secrets.NOTIFY_EMAIL }}"
 
-      - name: Deploy frontend to GCS
+      - name: Note
         run: |
-          # Sync the static `site/` folder to the GCS bucket
-          gsutil -m rsync -r site/ gs://${{ secrets.GCS_BUCKET }}
-          # Make bucket website-ready
-          gsutil web set -m index.html gs://${{ secrets.GCS_BUCKET }}
-          # Make objects publicly readable
-          gsutil iam ch allUsers:objectViewer gs://${{ secrets.GCS_BUCKET }}
-
-      - name: Output site URL
-        run: |
-          echo "Frontend published to: https://storage.googleapis.com/${{ secrets.GCS_BUCKET }}/index.html"
+          echo "Frontend deployment to GCS has been disabled; frontend is served via GitHub Pages."
