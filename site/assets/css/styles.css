@@ -80,6 +80,13 @@ body{font-family:'Open Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Hel
 .lb-close{position:absolute;right:1rem;top:1rem;background:transparent;border:0;color:#fff;font-size:1.8rem;cursor:pointer}
 .lb-caption{color:#ddd;margin-top:0.6rem;text-align:center}
 
+/* Lightbox navigation chevrons */
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.28);border:0;color:#fff;font-size:2.4rem;padding:0.4rem 0.6rem;border-radius:999px;cursor:pointer;backdrop-filter:blur(4px)}
+.lb-nav:hover{background:rgba(0,0,0,0.42)}
+.lb-prev{left:1rem}
+.lb-next{right:1rem}
+.lb-nav:focus{outline:2px solid rgba(255,255,255,0.12)}
+
 /* Booking form */
 .booking-form{max-width:720px;margin-top:1rem;display:grid;gap:0.8rem;background:var(--card);padding:1rem;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.06)}
 .booking-form label{display:block;font-weight:600}

@@ -20,6 +20,25 @@ function initSiteJS(){
       lightbox.setAttribute('aria-hidden','false');
     });
   }
+  // Prepare gallery image list for lightbox navigation
+  const galleryImgs = Array.from(document.querySelectorAll('.grid img'))
+    .map(i=>({
+      src: i.dataset.large || i.src,
+      alt: i.alt || ''
+    }));
+  let currentIndex = -1;
+  // Helper to show image by index (wraps)
+  function showImageByIndex(i){
+    if(!galleryImgs || !galleryImgs.length) return;
+    currentIndex = ((i % galleryImgs.length) + galleryImgs.length) % galleryImgs.length;
+    const item = galleryImgs[currentIndex];
+    if(lbImg) lbImg.src = item.src;
+    if(lbImg) lbImg.alt = item.alt || '';
+    if(lbCaption) lbCaption.textContent = item.alt || '';
+    if(lightbox) lightbox.setAttribute('aria-hidden','false');
+  }
+  function showNext(){ showImageByIndex(currentIndex + 1); }
+  function showPrev(){ showImageByIndex(currentIndex - 1); }
   function closeLB(){
     lightbox.setAttribute('aria-hidden','true');
     lbImg.src = '';
@@ -27,6 +46,11 @@ function initSiteJS(){
   if(lbClose && typeof lbClose.addEventListener === 'function'){
     lbClose.addEventListener('click', closeLB);
   }
+  // Prev/Next chevrons
+  const lbPrev = document.getElementById('lb-prev');
+  const lbNext = document.getElementById('lb-next');
+  if(lbPrev && typeof lbPrev.addEventListener === 'function') lbPrev.addEventListener('click', (e)=>{ e.stopPropagation(); showPrev(); });
+  if(lbNext && typeof lbNext.addEventListener === 'function') lbNext.addEventListener('click', (e)=>{ e.stopPropagation(); showNext(); });
   if(lightbox && typeof lightbox.addEventListener === 'function'){
     lightbox.addEventListener('click', (e)=>{
       if(e.target === lightbox) closeLB();
@@ -35,6 +59,46 @@ function initSiteJS(){
   // Only bind Escape handler when lightbox exists
   if(typeof document.addEventListener === 'function' && lightbox){
     document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLB(); });
+  }
+  // When lightbox opens via grid click, set current index accordingly
+  if(grid){
+    grid.addEventListener('click', (e)=>{
+      const img = e.target.closest('img');
+      if(!img) return;
+      const src = img.dataset.large || img.src;
+      const idx = galleryImgs.findIndex(g=>g.src === src || g.src === img.src);
+      if(idx >= 0) showImageByIndex(idx);
+    });
+  }
+
+  // Add wheel navigation inside lightbox (throttled)
+  if(lightbox){
+    let wheelLocked = false;
+    lightbox.addEventListener('wheel', (ev)=>{
+      ev.preventDefault();
+      if(wheelLocked) return;
+      wheelLocked = true;
+      try{
+        if(ev.deltaY > 0) showNext(); else showPrev();
+      }finally{
+        setTimeout(()=>{ wheelLocked = false; }, 180);
+      }
+    }, {passive:false});
+
+    // Click left/right halves of the image to navigate
+    if(lbImg){
+      lbImg.addEventListener('click', (ev)=>{
+        const rect = lbImg.getBoundingClientRect();
+        const x = ev.clientX - rect.left;
+        if(x < rect.width/2) showPrev(); else showNext();
+      });
+    }
+
+    // Keyboard left/right navigation
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'ArrowRight') showNext();
+      if(e.key === 'ArrowLeft') showPrev();
+    });
   }
 
   // Booking form handling (optional AJAX submit to Formspree)
@@ -82,8 +146,9 @@ function initSiteJS(){
 
       // If using Formspree, our own endpoint, or any relative action, do an AJAX submit for better UX
       if(action){
-        // Only intercept if it's a remote Formspree or our own API (relative path starting with /)
-        const shouldAjax = action.includes('formspree') || action.startsWith('/');
+        // Intercept common form endpoints for AJAX submit (relative paths, Formspree, or absolute http/https URLs).
+        // If fetch is blocked by CORS the catch will fall back to a normal form submission behavior.
+        const shouldAjax = action.includes('formspree') || action.startsWith('/') || action.startsWith('http');
         if(shouldAjax){
           ev.preventDefault();
           msg.textContent = 'Sending...';
