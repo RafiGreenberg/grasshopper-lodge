@@ -30,7 +30,7 @@ body{font-family:'Open Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Hel
 .grid img{width:100%;height:260px;object-fit:cover;border-radius:8px;cursor:pointer;display:block;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
 
 .about{margin:2rem 0}
-.muted{color:var(--muted)}
+.muted{display:none !important}
 
 .rates{width:100%;border-collapse:collapse;margin-bottom:1rem;background:var(--card);border-radius:8px;overflow:auto}
 .rates th,.rates td{padding:0.9rem;border-bottom:1px solid #f0ebe6;text-align:left}
