@@ -33,25 +33,7 @@ document.addEventListener('DOMContentLoaded', function(){
   const msg = document.getElementById('form-msg');
   if(form){
     form.addEventListener('submit', async (ev)=>{
-      // Determine if user wants to test the submit using httpbin.org (for local testing)
-      const testCheckbox = document.getElementById('test-submit');
-      const isTest = testCheckbox && testCheckbox.checked;
       const action = form.getAttribute('action');
-      // If test mode, intercept and POST to httpbin.org for a visible response
-      if(isTest){
-        ev.preventDefault();
-        msg.textContent = 'Sending (test)...';
-        const data = new FormData(form);
-        try{
-          const res = await fetch('https://httpbin.org/post', {method:'POST', body: data});
-          const text = await res.text();
-          msg.textContent = 'Test submit complete — see console for response.';
-          console.log('httpbin response', text);
-        }catch(err){
-          msg.textContent = 'Network error during test submit.';
-        }
-        return;
-      }
 
       // If using Formspree, our own endpoint, or any relative action, do an AJAX submit for better UX
       if(action){
@@ -64,16 +46,19 @@ document.addEventListener('DOMContentLoaded', function(){
           try{
             const res = await fetch(action, {method:'POST', body: data, headers:{'Accept':'application/json'}});
             if(res.ok){
-              msg.textContent = 'Thanks — booking request sent.';
-              form.reset();
+              // Redirect to a success page so users see a clear confirmation
+              window.location.href = 'booking-success.html';
             } else {
               // Try to parse JSON error, otherwise use status text
               let text = 'Submission failed — try again.';
               try{ const json = await res.json(); if(json && json.error) text = json.error; }catch(e){}
-              msg.textContent = text;
+              // Redirect to failure page (could show message there later)
+              window.location.href = 'booking-failure.html';
+              console.error('Form submission error', text);
             }
           }catch(err){
-            msg.textContent = 'Network error — try again later.';
+            // On network/server error, redirect to failure page
+            window.location.href = 'booking-failure.html';
             console.error('Submit error', err);
           }
         }

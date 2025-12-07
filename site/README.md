@@ -24,7 +24,7 @@ Quick setup
    - Create a free form at https://formspree.io/ and replace the `action` value with the endpoint they give you.
    - Alternatively use Netlify Forms (add `data-netlify="true"` to the form and deploy to Netlify) or point the `action` to your own booking backend.
 
-   - Testing the form locally: open `booking.html` and check the "Test submit" checkbox to POST the form to `https://httpbin.org/post` (no configuration required). The site also supports Formspree AJAX submits (will send JSON/accept header) when you set the `action` to your Formspree endpoint.
+   - The site supports Formspree AJAX submits (will send JSON/accept header) when you set the `action` to your Formspree endpoint.
 
 4. Test locally
    - Open `site/index.html` in a browser. To test the Formspree submit locally, you will need an internet connection to Formspree.
