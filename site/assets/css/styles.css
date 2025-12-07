@@ -56,8 +56,8 @@ body{font-family:'Open Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Hel
 .features-list li strong{display:block;color:var(--accent-2);margin-bottom:0.35rem}
 
 /* Reveal on scroll */
-.reveal-on-scroll{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
-.reveal-on-scroll.revealed{opacity:1;transform:none}
+.js .reveal-on-scroll, html.js .reveal-on-scroll{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
+.js .reveal-on-scroll.revealed, html.js .reveal-on-scroll.revealed{opacity:1;transform:none}
 
 .rates{width:100%;border-collapse:collapse;margin-bottom:1rem;background:var(--card);border-radius:8px;overflow:auto}
 .rates th,.rates td{padding:0.9rem;border-bottom:1px solid #f0ebe6;text-align:left}

@@ -1,5 +1,7 @@
 // Lightbox for gallery
 document.addEventListener('DOMContentLoaded', function(){
+  // Mark the document as JS-enabled so CSS can safely hide/show JS-driven elements
+  try{ document.documentElement.classList.add('js'); }catch(e){}
   const grid = document.querySelector('.grid');
   const lightbox = document.getElementById('lightbox');
   const lbImg = document.getElementById('lb-img');
