@@ -19,7 +19,7 @@ app.set('trust proxy', 1);
 app.use(helmet());
 
 // CORS: restrict to allowed origins. Set `ALLOWED_ORIGINS` as comma-separated env var.
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000,https://demo.grasshopperlodge.com').split(',').map(s => s.trim()).filter(Boolean);
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000,https://demo.grasshopperlodge.com,https://rafigreenberg.github.io').split(',').map(s => s.trim()).filter(Boolean);
 app.use(cors({
   origin: function(origin, callback){
     // allow non-browser requests (e.g. curl/postman) that have no origin
