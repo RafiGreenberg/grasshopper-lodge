@@ -113,7 +113,6 @@ app.post('/api/booking', bookingLimiter, async (req, res) => {
         }
         const j = await resp.json();
         const minScore = parseFloat(process.env.RECAPTCHA_MIN_SCORE || '0.45');
-        const isEnterprise = process.env.RECAPTCHA_ENTERPRISE === 'true';
         if(isEnterprise){
           // Enterprise response structure
           const valid = j.tokenProperties && j.tokenProperties.valid;
