@@ -95,17 +95,47 @@ app.post('/api/booking', bookingLimiter, async (req, res) => {
         params.append('secret', RECAPTCHA_SECRET);
         params.append('response', token);
         params.append('remoteip', req.ip);
-        const resp = await fetch('https://www.google.com/recaptcha/api/siteverify', { method: 'POST', body: params });
+        // Use Enterprise endpoint if RECAPTCHA_ENTERPRISE env is set, otherwise standard
+        const verifyUrl = process.env.RECAPTCHA_ENTERPRISE === 'true'
+          ? 'https://recaptchaenterprise.googleapis.com/v1/projects/' + process.env.GCP_PROJECT + '/assessments?key=' + RECAPTCHA_SECRET
+          : 'https://www.google.com/recaptcha/api/siteverify';
+        const isEnterprise = process.env.RECAPTCHA_ENTERPRISE === 'true';
+        let resp;
+        if(isEnterprise){
+          // Enterprise uses JSON body
+          resp = await fetch(verifyUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ event: { token, siteKey: process.env.RECAPTCHA_SITE_KEY, expectedAction: 'BOOKING' } })
+          });
+        } else {
+          resp = await fetch('https://www.google.com/recaptcha/api/siteverify', { method: 'POST', body: params });
+        }
         const j = await resp.json();
         const minScore = parseFloat(process.env.RECAPTCHA_MIN_SCORE || '0.45');
-        if(!j.success){
-          console.error('reCAPTCHA verify failed', j);
-          return res.status(403).json({ error: 'reCAPTCHA verification failed' });
-        }
-        // If score is present (v3) enforce threshold
-        if(typeof j.score === 'number' && j.score < minScore){
-          console.error('reCAPTCHA low score', j.score, 'threshold', minScore);
-          return res.status(403).json({ error: 'reCAPTCHA verification failed (low score)' });
+        const isEnterprise = process.env.RECAPTCHA_ENTERPRISE === 'true';
+        if(isEnterprise){
+          // Enterprise response structure
+          const valid = j.tokenProperties && j.tokenProperties.valid;
+          const score = j.riskAnalysis && j.riskAnalysis.score;
+          if(!valid){
+            console.error('reCAPTCHA Enterprise verify failed', j);
+            return res.status(403).json({ error: 'reCAPTCHA verification failed' });
+          }
+          if(typeof score === 'number' && score < minScore){
+            console.error('reCAPTCHA Enterprise low score', score, 'threshold', minScore);
+            return res.status(403).json({ error: 'reCAPTCHA verification failed (low score)' });
+          }
+        } else {
+          // Standard v3 response
+          if(!j.success){
+            console.error('reCAPTCHA verify failed', j);
+            return res.status(403).json({ error: 'reCAPTCHA verification failed' });
+          }
+          if(typeof j.score === 'number' && j.score < minScore){
+            console.error('reCAPTCHA low score', j.score, 'threshold', minScore);
+            return res.status(403).json({ error: 'reCAPTCHA verification failed (low score)' });
+          }
         }
       }catch(verErr){
         console.error('reCAPTCHA verification error', verErr);

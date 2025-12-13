@@ -115,13 +115,18 @@ function initSiteJS(){
   function loadRecaptcha(siteKey){
     return new Promise((resolve, reject)=>{
       if(!siteKey) return resolve(null);
+      // Support both Enterprise and standard reCAPTCHA
+      if(window.grecaptcha && window.grecaptcha.enterprise && typeof window.grecaptcha.enterprise.execute === 'function') return resolve(window.grecaptcha.enterprise);
       if(window.grecaptcha && typeof window.grecaptcha.execute === 'function') return resolve(window.grecaptcha);
-      const src = 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(siteKey);
+      // Use Enterprise endpoint
+      const src = 'https://www.google.com/recaptcha/enterprise.js?render=' + encodeURIComponent(siteKey);
       const s = document.createElement('script');
       s.src = src;
       s.async = true;
       s.defer = true;
       s.onload = ()=>{
+        // Prefer Enterprise API if available
+        if(window.grecaptcha && window.grecaptcha.enterprise) return resolve(window.grecaptcha.enterprise);
         if(window.grecaptcha) return resolve(window.grecaptcha);
         return reject(new Error('grecaptcha not available after script load'));
       };
@@ -182,8 +187,16 @@ function initSiteJS(){
           const siteKey = getRecaptchaSiteKey();
           if(siteKey){
             try{
-              await loadRecaptcha(siteKey);
-              const token = await window.grecaptcha.execute(siteKey, { action: 'booking' });
+              const recaptcha = await loadRecaptcha(siteKey);
+              // Use ready() wrapper for Enterprise reliability
+              const token = await new Promise((resolve, reject) => {
+                recaptcha.ready(async () => {
+                  try {
+                    const t = await recaptcha.execute(siteKey, { action: 'BOOKING' });
+                    resolve(t);
+                  } catch(e) { reject(e); }
+                });
+              });
               if(token) data.append('g-recaptcha-response', token);
             }catch(cErr){
               console.error('reCAPTCHA error', cErr);
