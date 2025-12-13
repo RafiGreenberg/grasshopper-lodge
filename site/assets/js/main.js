@@ -104,6 +104,31 @@ function initSiteJS(){
   // Booking form handling (optional AJAX submit to Formspree)
   const form = document.getElementById('booking-form');
   const msg = document.getElementById('form-msg');
+  // reCAPTCHA helpers: read site key from meta tag `recaptcha-site-key` or window.RECAPTCHA_SITE_KEY
+  function getRecaptchaSiteKey(){
+    if(window.RECAPTCHA_SITE_KEY) return window.RECAPTCHA_SITE_KEY;
+    const m = document.querySelector('meta[name="recaptcha-site-key"]');
+    if(m && m.content && m.content !== 'RECAPTCHA_SITE_KEY') return m.content;
+    return null;
+  }
+
+  function loadRecaptcha(siteKey){
+    return new Promise((resolve, reject)=>{
+      if(!siteKey) return resolve(null);
+      if(window.grecaptcha && typeof window.grecaptcha.execute === 'function') return resolve(window.grecaptcha);
+      const src = 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(siteKey);
+      const s = document.createElement('script');
+      s.src = src;
+      s.async = true;
+      s.defer = true;
+      s.onload = ()=>{
+        if(window.grecaptcha) return resolve(window.grecaptcha);
+        return reject(new Error('grecaptcha not available after script load'));
+      };
+      s.onerror = (e)=> reject(new Error('Failed to load reCAPTCHA script'));
+      document.head.appendChild(s);
+    });
+  }
   // Mobile menu toggle
   const menuToggle = document.querySelector('.menu-toggle');
   const header = document.querySelector('.site-header');
@@ -153,6 +178,20 @@ function initSiteJS(){
           ev.preventDefault();
           msg.textContent = 'Sending...';
           const data = new FormData(form);
+          // If reCAPTCHA site key present, obtain a token and append to the form data
+          const siteKey = getRecaptchaSiteKey();
+          if(siteKey){
+            try{
+              await loadRecaptcha(siteKey);
+              const token = await window.grecaptcha.execute(siteKey, { action: 'booking' });
+              if(token) data.append('g-recaptcha-response', token);
+            }catch(cErr){
+              console.error('reCAPTCHA error', cErr);
+              // If reCAPTCHA fails to load or execute, treat as failure
+              window.location.href = 'booking-failure.html';
+              return;
+            }
+          }
           try{
             const res = await fetch(action, {method:'POST', body: data, headers:{'Accept':'application/json'}});
             if(res.ok){

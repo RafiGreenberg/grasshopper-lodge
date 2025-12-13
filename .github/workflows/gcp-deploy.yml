@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy frontend and backend to GCP
+    name: Deploy backend to GCP
     runs-on: ubuntu-latest
     env:
       CLOUD_RUN_SERVICE: grasshopper-lodge-server
